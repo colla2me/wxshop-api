@@ -1,6 +1,5 @@
 package com.spring.wxshop.service.impl;
 
-import com.spring.wxshop.generate.User;
 import com.spring.wxshop.service.AuthService;
 import com.spring.wxshop.service.SmsCodeService;
 import com.spring.wxshop.service.UserService;

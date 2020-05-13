@@ -1,4 +1,4 @@
-package com.spring.wxshop.generate;
+package com.spring.wxshop.generated;
 
 import java.util.ArrayList;
 import java.util.Date;

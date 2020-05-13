@@ -1,8 +1,8 @@
 package com.spring.wxshop.dao;
 
-import com.spring.wxshop.generate.User;
-import com.spring.wxshop.generate.UserExample;
-import com.spring.wxshop.generate.UserMapper;
+import com.spring.wxshop.generated.User;
+import com.spring.wxshop.generated.UserExample;
+import com.spring.wxshop.generated.UserMapper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;

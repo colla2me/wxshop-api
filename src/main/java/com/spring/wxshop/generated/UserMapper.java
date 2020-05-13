@@ -1,7 +1,5 @@
-package com.spring.wxshop.generate;
+package com.spring.wxshop.generated;
 
-import com.spring.wxshop.generate.User;
-import com.spring.wxshop.generate.UserExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

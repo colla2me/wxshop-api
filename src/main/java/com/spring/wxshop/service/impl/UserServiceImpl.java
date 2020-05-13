@@ -1,7 +1,7 @@
 package com.spring.wxshop.service.impl;
 
 import com.spring.wxshop.dao.UserDao;
-import com.spring.wxshop.generate.User;
+import com.spring.wxshop.generated.User;
 import com.spring.wxshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
