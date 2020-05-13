@@ -1,0 +1,7 @@
+<FindBugsFilter>
+    <Match>
+        <Or>
+            <Package name="com.spring.wxshop.generated"/>
+        </Or>
+    </Match>
+</FindBugsFilter>

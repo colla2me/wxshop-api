@@ -20,8 +20,8 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
         Map<String, String> pattern = new HashMap<>();
-        pattern.put("/api/code", "anonymous");
-        pattern.put("/api/login", "anonymous");
+        pattern.put("/api/code", "anon");
+        pattern.put("/api/login", "anon");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(pattern);
         return shiroFilterFactoryBean;
     }
