@@ -18,11 +18,10 @@ public class ShiroRealm extends AuthorizingRealm {
     @Autowired
     public ShiroRealm(SmsCodeService smsCodeService) {
         this.smsCodeService = smsCodeService;
-        this.setCredentialsMatcher((token, info) -> getCredentialsWithToken(token).equals(info.getCredentials()));
-    }
-
-    private String getCredentialsWithToken(AuthenticationToken token) {
-        return (String) token.getCredentials();
+        this.setCredentialsMatcher((token, info) -> {
+            String credentials = new String((char[]) token.getCredentials());
+            return credentials.equals(info.getCredentials());
+        });
     }
 
     @Override

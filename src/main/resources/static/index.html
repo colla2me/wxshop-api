@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wxshop</title>
+    <style>
+        html,
+        body {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <form action="/code" method="post" target="_self">
+        <p>
+            <label for="tel1">phone number</label>
+            <input type="text" name="tel" id="tel1" />
+        </p>
+        <button type="button" onclick="onSmsCode()">SmsCode</button>
+    </form>
+</div>
+<hr />
+<div class="container">
+    <p>
+        <label for="tel2">phone number</label>
+        <input type="text" name="tel" id="tel2" />
+    </p>
+    <p>
+        <label for="code">verification code</label>
+        <input type="text" name="code" id="code" />
+    </p>
+    <button type="button" onclick="onLogin()">Login</button>
+</div>
+
+<script>
+
+    function onLogin() {
+        window.sendAjax("/api/login", {
+            'tel': document.getElementById("tel2").value,
+            'code': document.getElementById("code").value
+        });
+    }
+
+    function onSmsCode() {
+        window.sendAjax("/api/code", {
+            'tel': document.getElementById("tel1").value
+        });
+    }
+
+    function sendAjax(url, formData) {
+        const xhr = new XMLHttpRequest();
+        xhr.timeout = 3000;
+        xhr.responseType = "text";
+        xhr.onload = function (e) {
+            if (this.status === 200 || this.status === 304) {
+                alert("Response isOk: " + this.responseText);
+            }
+        };
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader("Content-type", "application/json;charset=utf-8")
+        xhr.send(JSON.stringify(formData));
+    }
+</script>
+</body>
+
+</html>

@@ -17,7 +17,7 @@ public class MockSmsCodeServiceImpl implements SmsCodeService {
 
     @Override
     public void setCode(String code, String tel) {
-        telAndCodes.put(code, tel);
+        telAndCodes.put(tel, code);
     }
 
     @Override
