@@ -40,6 +40,8 @@
         <input type="text" name="code" id="code" />
     </p>
     <button type="button" onclick="onLogin()">Login</button>
+    <button type="button" onclick="onStatus()">Refresh status</button>
+    <button type="button" onclick="onLogout()">Logout</button>
 </div>
 
 <script>
@@ -48,16 +50,24 @@
         window.sendAjax("/api/login", {
             'tel': document.getElementById("tel2").value,
             'code': document.getElementById("code").value
-        });
+        }, 'POST');
     }
 
     function onSmsCode() {
         window.sendAjax("/api/code", {
             'tel': document.getElementById("tel1").value
-        });
+        }, 'POST');
     }
 
-    function sendAjax(url, formData) {
+    function onStatus() {
+        window.sendAjax("/api/status", {}, 'GET');
+    }
+
+    function onLogout() {
+        window.sendAjax("/api/logout", {}, 'POST');
+    }
+
+    function sendAjax(url, formData, method) {
         const xhr = new XMLHttpRequest();
         xhr.timeout = 3000;
         xhr.responseType = "text";
@@ -66,7 +76,7 @@
                 alert("Response isOk: " + this.responseText);
             }
         };
-        xhr.open('POST', url, true);
+        xhr.open(method, url, true);
         xhr.setRequestHeader("Content-type", "application/json;charset=utf-8")
         xhr.send(JSON.stringify(formData));
     }

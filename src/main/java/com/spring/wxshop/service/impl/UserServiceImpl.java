@@ -6,6 +6,8 @@ import com.spring.wxshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
@@ -17,14 +19,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUserIfNotExists(String tel) {
-        User user = new User();
-        user.setTel(tel);
         try {
+            User user = new User();
+            user.setTel(tel);
+            user.setCreatedAt(new Date());
+            user.setUpdatedAt(new Date());
             userDao.insertNewUser(user);
             return user;
         } catch (Exception e) {
             e.printStackTrace();
             return userDao.getUserByTel(tel);
         }
+    }
+
+    @Override
+    public User getUserByTel(String tel) {
+        return userDao.getUserByTel(tel);
     }
 }
