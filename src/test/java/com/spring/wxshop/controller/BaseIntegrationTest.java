@@ -1,10 +1,11 @@
 package com.spring.wxshop.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.wxshop.entity.LoginStatus;
 import com.spring.wxshop.generated.User;
-import org.apache.http.HttpStatus;
+import org.apache.http.Header;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
@@ -14,6 +15,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.ClassicConfiguration;
 import org.junit.jupiter.api.AfterEach;
@@ -25,8 +27,12 @@ import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.net.HttpURLConnection.HTTP_OK;
 
 public class BaseIntegrationTest {
     public enum HttpMethod {
@@ -56,7 +62,7 @@ public class BaseIntegrationTest {
 
     static final ObjectMapper objectMapper = new ObjectMapper();
     static final TelAndCode telAndCode = new TelAndCode("13812345678", "000000");
-    static final TelAndCode onlyTel = new TelAndCode("13812345678", null);
+    static final TelAndCode anyTel = new TelAndCode("13812345678", null);
     static final TelAndCode wrongCode = new TelAndCode("13812345678", "123456");
     static final TelAndCode allEmpty = new TelAndCode(null, null);
 
@@ -78,9 +84,11 @@ public class BaseIntegrationTest {
         client.close();
     }
 
-    public CloseableHttpResponse doHttpRequest(String apiName, HttpMethod method, Map<String, String> params) throws IOException {
+    public HttpResponse doHttpRequest(String apiName, HttpMethod method, Map<String, String> params) throws IOException {
         HttpUriRequest uriRequest = createRequest(getUrl(apiName), method, params);
-        return client.execute(uriRequest);
+        try (CloseableHttpResponse closeableHttpResponse = client.execute(uriRequest)) {
+            return new HttpResponse(closeableHttpResponse);
+        }
     }
 
     public String getUrl(String apiName) {
@@ -89,13 +97,13 @@ public class BaseIntegrationTest {
 
     public LoginResult getLoginResult() throws IOException {
         /* status: not logged in */
-        CloseableHttpResponse httpResponse = doHttpRequest("/api/v1/status", HttpMethod.GET, null);
-        LoginStatus loginStatus = objectMapper.readValue(httpResponse.getEntity().getContent(), LoginStatus.class);
+        HttpResponse httpResponse = doHttpRequest("/api/v1/status", HttpMethod.GET, null);
+        LoginStatus loginStatus = objectMapper.readValue(httpResponse.body, LoginStatus.class);
         Assertions.assertFalse(loginStatus.isLogin());
 
         /* send code to login */
-        httpResponse = doHttpRequest("/api/v1/code", HttpMethod.POST, onlyTel.toMap());
-        Assertions.assertEquals(HttpStatus.SC_OK, httpResponse.getStatusLine().getStatusCode());
+        httpResponse = doHttpRequest("/api/v1/code", HttpMethod.POST, anyTel.toMap());
+        Assertions.assertEquals(HTTP_OK, httpResponse.code);
 
         /* login with tel and code */
         doHttpRequest("/api/v1/login", HttpMethod.POST, telAndCode.toMap());
@@ -103,7 +111,7 @@ public class BaseIntegrationTest {
 
         /* status: logged in */
         httpResponse = doHttpRequest("/api/v1/status", HttpMethod.GET, null);
-        loginStatus = objectMapper.readValue(httpResponse.getEntity().getContent(), LoginStatus.class);
+        loginStatus = objectMapper.readValue(httpResponse.body, LoginStatus.class);
         return new LoginResult(loginStatus.getUser(), cookie, loginStatus.isLogin());
     }
 
@@ -133,6 +141,27 @@ public class BaseIntegrationTest {
             map.put("tel", tel);
             map.put("code", code);
             return map;
+        }
+    }
+
+    public static class HttpResponse {
+        int code;
+        String body;
+        List<Header> headers;
+
+        HttpResponse(CloseableHttpResponse response) throws IOException {
+            this.code = response.getStatusLine().getStatusCode();
+            this.body = EntityUtils.toString(response.getEntity());
+            this.headers = Arrays.asList(response.getAllHeaders());
+        }
+
+        HttpResponse assertOkStatusCode() {
+            Assertions.assertTrue(code >= 200 && code < 300, "" + code + ": " + body);
+            return this;
+        }
+
+        public <T> T asJsonObject(TypeReference<T> typeReference) throws JsonProcessingException {
+            return objectMapper.readValue(body, typeReference);
         }
     }
 

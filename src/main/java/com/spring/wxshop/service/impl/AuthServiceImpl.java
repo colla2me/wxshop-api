@@ -33,6 +33,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean isValidTel(String tel) {
+        if (tel == null) {
+            return false;
+        }
         return RegexUtils.Regex.TEL.matches(tel);
     }
 }

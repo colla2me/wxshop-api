@@ -1,7 +1,5 @@
 package com.spring.wxshop.entity;
 
-import javax.validation.constraints.NotNull;
-
 public class Result<T> {
     T data;
     int code;
