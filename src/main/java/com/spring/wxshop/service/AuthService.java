@@ -4,7 +4,7 @@ public interface AuthService {
 
     String sendVerificationCode(String tel);
 
-    boolean isValidCodeForTel(String tel, String code);
+    boolean isCorrectCode(String tel, String code);
 
     boolean isValidTel(String tel);
 }

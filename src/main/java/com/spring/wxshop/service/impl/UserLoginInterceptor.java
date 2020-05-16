@@ -25,13 +25,13 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         Object tel = SecurityUtils.getSubject().getPrincipal();
         if (tel != null) {
             User user = userService.getUserByTel(tel.toString());
-            UserContext.setUser(user);
+            UserContext.setContext(user);
         }
         return true;
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        UserContext.clear();
+        UserContext.clearContext();
     }
 }

@@ -1,23 +1,15 @@
 package com.spring.wxshop.entity;
 
-public abstract class Result<T> {
-    public enum Status {
-        OK("ok"),
-        FAIL("fail");
-        private final String status;
+import javax.validation.constraints.NotNull;
 
-        Status(String status) {
-            this.status = status;
-        }
-    }
-
+public class Result<T> {
     T data;
+    int code;
     String message;
-    Status status;
 
-    public Result(T data, Status status, String message) {
+    public Result(T data, int code, String message) {
         this.data = data;
-        this.status = status;
+        this.code = code;
         this.message = message;
     }
 
@@ -25,11 +17,24 @@ public abstract class Result<T> {
         return data;
     }
 
-    public String getStatus() {
-        return status.status;
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
     }
 
     public String getMessage() {
         return message;
     }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
+

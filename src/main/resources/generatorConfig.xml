@@ -30,6 +30,5 @@
             <columnOverride column="created_at" property="createdAt"/>
             <columnOverride column="updated_at" property="updatedAt"/>
         </table>
-
     </context>
 </generatorConfiguration>

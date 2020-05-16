@@ -4,17 +4,17 @@ import com.spring.wxshop.generated.User;
 
 public class UserContext {
 
-    private static final ThreadLocal<User> currentUser = new ThreadLocal<>();
+    private static final ThreadLocal<User> context = new ThreadLocal<>();
 
-    public static void setUser(User user) {
-        currentUser.set(user);
+    public static void setContext(User user) {
+        context.set(user);
     }
 
-    public static User getUser() {
-        return currentUser.get();
+    public static User getContext() {
+        return context.get();
     }
 
-    public static void clear() {
-        currentUser.remove();
+    public static void clearContext() {
+        context.remove();
     }
 }

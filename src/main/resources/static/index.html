@@ -47,24 +47,24 @@
 <script>
 
     function onLogin() {
-        window.sendAjax("/api/login", {
+        window.sendAjax("/api/v1/login", {
             'tel': document.getElementById("tel2").value,
             'code': document.getElementById("code").value
         }, 'POST');
     }
 
     function onSmsCode() {
-        window.sendAjax("/api/code", {
+        window.sendAjax("/api/v1/code", {
             'tel': document.getElementById("tel1").value
         }, 'POST');
     }
 
     function onStatus() {
-        window.sendAjax("/api/status", {}, 'GET');
+        window.sendAjax("/api/v1/status", {}, 'GET');
     }
 
     function onLogout() {
-        window.sendAjax("/api/logout", {}, 'POST');
+        window.sendAjax("/api/v1/logout", {}, 'POST');
     }
 
     function sendAjax(url, formData, method) {

@@ -1,6 +1,6 @@
 package com.spring.wxshop.controller;
 
-import com.spring.wxshop.entity.LoginResult;
+import com.spring.wxshop.entity.LoginStatus;
 import com.spring.wxshop.service.AuthService;
 import com.spring.wxshop.service.impl.UserContext;
 import org.apache.shiro.SecurityUtils;
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class AuthController {
     private final AuthService authService;
 
@@ -33,27 +33,34 @@ public class AuthController {
 
     @PostMapping("/login")
     public void login(@RequestBody Map<String, String> body, HttpServletResponse response) {
-        if (body != null && authService.isValidCodeForTel(body.get("tel"), body.get("code"))) {
-            UsernamePasswordToken token = new UsernamePasswordToken(body.get("tel"), body.get("code"));
-            token.setRememberMe(true);
-            SecurityUtils.getSubject().login(token);
-        } else {
+        if (body == null || body.get("tel") == null || body.get("code") == null) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
+            return;
         }
+        if (!authService.isCorrectCode(body.get("tel"), body.get("code"))) {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            return;
+        }
+        UsernamePasswordToken token = new UsernamePasswordToken(body.get("tel"), body.get("code"));
+        token.setRememberMe(true);
+        SecurityUtils.getSubject().login(token);
     }
 
     @PostMapping("/logout")
-    public void logout() {
-        UserContext.clear();
-        SecurityUtils.getSubject().logout();
+    public void logout(HttpServletResponse response) {
+        if (UserContext.getContext() == null) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        } else {
+            SecurityUtils.getSubject().logout();
+        }
     }
 
     @GetMapping("/status")
-    @ResponseBody
-    public Object loginStatus() {
-        if (UserContext.getUser() == null) {
-            return LoginResult.notLoggedIn();
+    public LoginStatus loginStatus(HttpServletResponse response) {
+        if (UserContext.getContext() == null) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return LoginStatus.logout(response.getStatus());
         }
-        return LoginResult.loggedIn(UserContext.getUser());
+        return LoginStatus.login(UserContext.getContext());
     }
 }

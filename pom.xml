@@ -63,6 +63,22 @@
             <artifactId>annotations</artifactId>
             <version>3.0.1</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.commons</groupId>-->
+<!--            <artifactId>commons-lang3</artifactId>-->
+<!--            <version>3.9</version>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -81,7 +97,15 @@
                         <artifactId>mysql-connector-java</artifactId>
                         <version>8.0.20</version>
                     </dependency>
+                    <dependency>
+                        <groupId>com.qiukeke</groupId>
+                        <artifactId>mybatis-generator-limit-plugin</artifactId>
+                        <version>1.0.4</version>
+                    </dependency>
                 </dependencies>
+                <configuration>
+                    <overwrite>true</overwrite>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.flywaydb</groupId>
