@@ -4,6 +4,7 @@ import com.spring.wxshop.dao.UserDao;
 import com.spring.wxshop.generated.User;
 import com.spring.wxshop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedAt(new Date());
             userDao.insertNewUser(user);
             return user;
-        } catch (Exception e) {
+        } catch (DuplicateKeyException e) {
             e.printStackTrace();
             return userDao.getUserByTel(tel);
         }

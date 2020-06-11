@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,21 +36,6 @@ import java.util.Map;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 public class BaseIntegrationTest {
-    public enum HttpMethod {
-        GET("GET"),
-        POST("POST"),
-        PATCH("PATCH");
-
-        final String method;
-        HttpMethod(String method) {
-            this.method = method;
-        }
-
-        public String value() {
-            return method;
-        }
-    }
-
     @Autowired
     Environment environment;
 
@@ -60,6 +46,7 @@ public class BaseIntegrationTest {
     @Value("${spring.datasource.password}")
     private String databasePassword;
 
+    static final String apiVersion = "/api/v1";
     static final ObjectMapper objectMapper = new ObjectMapper();
     static final TelAndCode telAndCode = new TelAndCode("13812345678", "000000");
     static final TelAndCode anyTel = new TelAndCode("13812345678", null);
@@ -92,51 +79,52 @@ public class BaseIntegrationTest {
     }
 
     public String getUrl(String apiName) {
-        return "http://localhost:" + environment.getProperty("local.server.port") + apiName;
+        String port = environment.getProperty("local.server.port");
+        return "http://localhost:" + port + apiVersion + apiName;
     }
 
     public LoginResult getLoginResult() throws IOException {
         /* status: not logged in */
-        HttpResponse httpResponse = doHttpRequest("/api/v1/status", HttpMethod.GET, null);
+        HttpResponse httpResponse = doHttpRequest("/status", HttpMethod.GET, null);
         LoginStatus loginStatus = objectMapper.readValue(httpResponse.body, LoginStatus.class);
         Assertions.assertFalse(loginStatus.isLogin());
 
         /* send code to login */
-        httpResponse = doHttpRequest("/api/v1/code", HttpMethod.POST, anyTel.toMap());
+        httpResponse = doHttpRequest("/code", HttpMethod.POST, anyTel.toMap());
         Assertions.assertEquals(HTTP_OK, httpResponse.code);
 
         /* login with tel and code */
-        doHttpRequest("/api/v1/login", HttpMethod.POST, telAndCode.toMap());
+        doHttpRequest("/login", HttpMethod.POST, telAndCode.toMap());
         String cookie = cookieStore.getCookies().stream().findFirst().map(Cookie::getValue).get();
 
         /* status: logged in */
-        httpResponse = doHttpRequest("/api/v1/status", HttpMethod.GET, null);
+        httpResponse = doHttpRequest("/status", HttpMethod.GET, null);
         loginStatus = objectMapper.readValue(httpResponse.body, LoginStatus.class);
         return new LoginResult(loginStatus.getUser(), cookie, loginStatus.isLogin());
     }
 
-    public static class LoginResult {
+    static class LoginResult {
         User user;
         String cookie;
         boolean isLogin;
 
-        public LoginResult(User user, String cookie, boolean isLogin) {
+        LoginResult(User user, String cookie, boolean isLogin) {
             this.user = user;
             this.cookie = cookie;
             this.isLogin = isLogin;
         }
     }
 
-    public static class TelAndCode {
+    static class TelAndCode {
         String tel;
         String code;
 
-        public TelAndCode(String tel, String code) {
+        TelAndCode(String tel, String code) {
             this.tel = tel;
             this.code = code;
         }
 
-        public Map<String, String> toMap() {
+        Map<String, String> toMap() {
             Map<String, String> map = new HashMap<>();
             map.put("tel", tel);
             map.put("code", code);
@@ -144,7 +132,7 @@ public class BaseIntegrationTest {
         }
     }
 
-    public static class HttpResponse {
+    static class HttpResponse {
         int code;
         String body;
         List<Header> headers;
@@ -160,7 +148,7 @@ public class BaseIntegrationTest {
             return this;
         }
 
-        public <T> T asJsonObject(TypeReference<T> typeReference) throws JsonProcessingException {
+        <T> T asJsonObject(TypeReference<T> typeReference) throws JsonProcessingException {
             return objectMapper.readValue(body, typeReference);
         }
     }

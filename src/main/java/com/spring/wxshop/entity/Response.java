@@ -8,7 +8,7 @@ public class Response {
         return new Result<>(data, status.value(), status.getReasonPhrase());
     }
 
-    public static <T> Result<T> failure(HttpStatus status, String message) {
+    public static <T> Result<T> failure(String message, HttpStatus status) {
         return new Result<>(null, status.value(), message);
     }
 }
